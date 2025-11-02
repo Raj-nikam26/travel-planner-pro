@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packing List Generator - TravelPlan Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="../index.html" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        🌍 TravelPlan Pro
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="../index.html" class="text-gray-600 hover:text-gray-900 transition">Home</a>
+                    <a href="generator.html" class="text-gray-600 hover:text-gray-900 transition">Generator</a>
+                    <a href="recommender.html" class="text-gray-600 hover:text-gray-900 transition">Recommender</a>
+                    <a href="packing.html" class="text-gray-900 font-semibold border-b-2 border-blue-600 pb-1">Packing</a>
+                    <a href="saved.html" class="text-gray-600 hover:text-gray-900 transition">My Trips</a>
+                    
+                    <div class="flex items-center gap-4 border-l pl-8">
+                        <span id="auth-username" class="text-sm font-semibold text-gray-700"></span>
+                        <button onclick="logout()" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-2 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            📦 Smart Packing List Generator
+        </h1>
+        <p class="text-center text-gray-600 mb-8">Get AI-powered packing recommendations based on your trip!</p>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Input Form -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">Trip Details</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📍 Destination</label>
+                        <input type="text" id="destination" placeholder="e.g., Paris, Tokyo..." 
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📅 Duration</label>
+                        <input type="number" id="duration" placeholder="Days" min="1" max="30"
+                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🌡️ Weather</label>
+                        <select id="weather" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                            <option value="">Select weather...</option>
+                            <option value="Hot">🔥 Hot & Sunny</option>
+                            <option value="Cold">❄️ Cold & Snowy</option>
+                            <option value="Mild">🍂 Mild & Temperate</option>
+                            <option value="Rainy">🌧️ Rainy</option>
+                            <option value="Mixed">🌤️ Mixed</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🎯 Activities</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="beach" class="mr-2 w-4 h-4"> 🏖️ Beach
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="hiking" class="mr-2 w-4 h-4"> 🏔️ Hiking
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="formal" class="mr-2 w-4 h-4"> 🎩 Formal Events
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="sports" class="mr-2 w-4 h-4"> ⚽ Sports
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="business" class="mr-2 w-4 h-4"> 💼 Business
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="generatePackingList()" id="generate-btn"
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300">
+                        ✨ Generate Packing List
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div>
+                <!-- Loading -->
+                <div id="loading" class="hidden bg-white rounded-xl shadow-xl p-12 text-center">
+                    <div class="flex space-x-2 mb-4 justify-center">
+                        <div class="w-4 h-4 bg-blue-600 rounded-full animate-bounce"></div>
+                        <div class="w-4 h-4 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-4 h-4 bg-amber-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                    <p class="text-xl text-gray-600 font-semibold">Creating your packing list...</p>
+                </div>
+
+                <!-- Packing List -->
+                <div id="packing-result" class="hidden bg-white rounded-xl shadow-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-bold text-gray-900">📦 Your Packing List</h3>
+                        <button onclick="downloadList()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">📥 Download</button>
+                    </div>
+                    <div id="packing-content" class="space-y-4"></div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="bg-white rounded-xl shadow-xl p-12 text-center">
+                    <div class="text-6xl mb-4">📦</div>
+                    <p class="text-gray-600">Enter your trip details to get a smart packing list!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        requireAuth();
+    });
+
+    const MODEL_NAME = "gemini-2.0-flash-exp";
+    const API_KEY = "AIzaSyDHjAULKuG1OLN8J5LNMkTgwQ5Fz_t8c3Y";
+
+    async function generatePackingList() {
+        const destination = document.getElementById('destination').value.trim();
+        const duration = document.getElementById('duration').value;
+        const weather = document.getElementById('weather').value;
+        
+        const activities = [];
+        if (document.getElementById('beach').checked) activities.push('Beach');
+        if (document.getElementById('hiking').checked) activities.push('Hiking');
+        if (document.getElementById('formal').checked) activities.push('Formal Events');
+        if (document.getElementById('sports').checked) activities.push('Sports');
+        if (document.getElementById('business').checked) activities.push('Business');
+
+        if (!destination || !duration || !weather) {
+            alert('❌ Please fill in all required fields');
+            return;
+        }
+
+        document.getElementById('generate-btn').disabled = true;
+        document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('empty-state').classList.add('hidden');
+        document.getElementById('packing-result').classList.add('hidden');
+
+        const prompt = `Create a smart packing list for a trip to ${destination}:
+- Duration: ${duration} days
+- Weather: ${weather}
+- Activities: ${activities.length > 0 ? activities.join(', ') : 'General sightseeing'}
+
+Organize into categories with specific items:
+
+📚 ESSENTIALS
+📱 ELECTRONICS  
+👕 CLOTHING
+👟 FOOTWEAR
+💄 TOILETRIES
+🩹 HEALTH & SAFETY
+🎒 TRAVEL ITEMS
+🧥 WEATHER-SPECIFIC
+${activities.includes('Beach') ? '🏖️ BEACH ITEMS' : ''}
+${activities.includes('Hiking') ? '🏔️ HIKING GEAR' : ''}
+${activities.includes('Formal Events') ? '🎩 FORMAL WEAR' : ''}
+${activities.includes('Business') ? '💼 BUSINESS ITEMS' : ''}
+
+For each item, mark if it's:
+✓ MUST-HAVE
+◐ OPTIONAL
+✗ LEAVE AT HOME
+
+Keep it practical and concise!`;
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.candidates?.[0]?.content) {
+                displayPackingList(data.candidates[0].content.parts[0].text, destination, duration, weather);
+            } else {
+                alert('❌ Could not generate packing list');
+            }
+        } catch (error) {
+            alert('❌ Error: ' + error.message);
+        } finally {
+            document.getElementById('generate-btn').disabled = false;
+            document.getElementById('loading').classList.add('hidden');
+        }
+    }
+
+    function displayPackingList(text, destination, duration, weather) {
+        const content = document.getElementById('packing-content');
+        content.innerHTML = '';
+
+        const categories = text.split(/\n(?=[📚📱👕👟💄🩹🎒🧥🏖️🏔️🎩💼])/);
+
+        categories.forEach(category => {
+            if (category.trim()) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4';
+                categoryDiv.innerHTML = `
+                    <div class="font-bold text-gray-900 mb-3">${category.split('\n')[0]}</div>
+                    <div class="space-y-1 text-sm text-gray-700">
+                        ${category.split('\n').slice(1).map(item => {
+                            if (item.trim()) {
+                                const isChecked = localStorage.getItem(`pack-${item.trim()}`) === 'true';
+                                return `
+                                    <label class="flex items-center cursor-pointer hover:bg-white p-1 rounded transition">
+                                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="savePacking(this, '${item.trim()}')"  
+                                               class="mr-2 w-4 h-4">
+                                        <span class="${isChecked ? 'line-through text-gray-500' : ''}">${item.trim()}</span>
+                                    </label>
+                                `;
+                            }
+                            return '';
+                        }).join('')}
+                    </div>
+                `;
+                content.appendChild(categoryDiv);
+            }
+        });
+
+        document.getElementById('empty-state').classList.add('hidden');
+        document.getElementById('packing-result').classList.remove('hidden');
+    }
+
+    function savePacking(checkbox, item) {
+        localStorage.setItem(`pack-${item}`, checkbox.checked);
+    }
+
+    function downloadList() {
+    const destination = document.getElementById('destination').value || 'Packing List';
+    const content = document.getElementById('packing-content');
+    
+    if (!content || content.children.length === 0) {
+        alert('❌ Please generate a packing list first!');
+        return;
+    }
+
+    try {
+        // Create beautiful PDF HTML
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    * { margin: 0; padding: 0; }
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        padding: 20px; 
+                        line-height: 1.6;
+                        background: white;
+                    }
+                    .header { 
+                        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); 
+                        color: white; 
+                        padding: 20px; 
+                        border-radius: 8px; 
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
+                    .header h1 { font-size: 24px; margin-bottom: 10px; }
+                    .header-info { font-size: 12px; opacity: 0.9; }
+                    .category { 
+                        margin-bottom: 15px; 
+                        page-break-inside: avoid;
+                        background: #f9fafb;
+                        padding: 12px;
+                        border-radius: 6px;
+                        border-left: 4px solid #2563eb;
+                    }
+                    .category-title { 
+                        font-weight: bold; 
+                        color: #1f2937;
+                        margin-bottom: 8px;
+                        font-size: 14px;
+                    }
+                    .item { 
+                        padding: 4px 0; 
+                        font-size: 12px;
+                        color: #374151;
+                        border-bottom: 1px dotted #e5e7eb;
+                    }
+                    .item:last-child { border-bottom: none; }
+                    .checked { 
+                        text-decoration: line-through; 
+                        color: #9ca3af; 
+                    }
+                    .footer { 
+                        margin-top: 20px; 
+                        padding-top: 15px; 
+                        border-top: 1px solid #e5e7eb; 
+                        text-align: center; 
+                        color: #6b7280; 
+                        font-size: 11px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>📦 Packing List</h1>
+                    <div class="header-info">
+                        <p>Destination: <strong>${destination}</strong></p>
+                        <p>Generated: ${new Date().toLocaleDateString()}</p>
+                    </div>
+                </div>
+                
+                <div class="content">
+        `;
+
+        let pdfHTML = htmlContent;
+
+        // Add all categories
+        document.querySelectorAll('#packing-content > div').forEach(categoryDiv => {
+            const categoryTitle = categoryDiv.querySelector('.font-bold');
+            if (categoryTitle) {
+                pdfHTML += `<div class="category"><div class="category-title">${categoryTitle.textContent}</div>`;
+                
+                const labels = categoryDiv.querySelectorAll('label');
+                labels.forEach(label => {
+                    const checkbox = label.querySelector('input');
+                    const itemText = label.textContent.trim();
+                    const isChecked = checkbox.checked ? ' checked' : '';
+                    pdfHTML += `<div class="item${isChecked ? ' checked' : ''}">${checkbox.checked ? '✓' : '○'} ${itemText}</div>`;
+                });
+                
+                pdfHTML += `</div>`;
+            }
+        });
+
+        pdfHTML += `
+                </div>
+                <div class="footer">
+                    <p>Generated by TravelPlan Pro | Smart Travel Planning with AI</p>
+                    <p>Date: ${new Date().toLocaleString()}</p>
+                </div>
+            </body>
+            </html>
+        `;
+
+        // Download as PDF
+        const opt = {
+            margin: 10,
+            filename: `packing_list_${destination}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+        };
+
+        // Make sure html2pdf is loaded
+        if (typeof html2pdf === 'undefined') {
+            alert('❌ PDF library not loaded. Please refresh the page and try again.');
+            return;
+        }
+
+        html2pdf().set(opt).from(pdfHTML).save();
+        alert('✅ Packing list downloaded as PDF!');
+
+    } catch (error) {
+        console.error('Download error:', error);
+        alert('❌ Download failed. Please try again. Error: ' + error.message);
+    }
+}
+
+</script>
+
+
+
+
+    <!-- Dark Mode Toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.createElement('button');
+            darkModeToggle.id = 'dark-mode-btn';
+            darkModeToggle.innerHTML = '🌙';
+            darkModeToggle.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                z-index: 999;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                transition: all 0.3s;
+            `;
+            
+            darkModeToggle.onmouseover = function() {
+                this.style.transform = 'scale(1.15)';
+            };
+            darkModeToggle.onmouseout = function() {
+                this.style.transform = 'scale(1)';
+            };
+            
+            if (localStorage.getItem('darkMode') === 'true') {
+                enableDarkMode();
+                darkModeToggle.innerHTML = '☀️';
+            }
+            
+            darkModeToggle.onclick = function() {
+                if (document.body.classList.contains('dark-mode')) {
+                    disableDarkMode();
+                    localStorage.setItem('darkMode', 'false');
+                    this.innerHTML = '🌙';
+                } else {
+                    enableDarkMode();
+                    localStorage.setItem('darkMode', 'true');
+                    this.innerHTML = '☀️';
+                }
+            };
+            
+            document.body.appendChild(darkModeToggle);
+        });
+
+        function enableDarkMode() {
+            document.body.classList.add('dark-mode');
+            document.body.style.background = '#0f172a';
+            document.querySelectorAll('.bg-white').forEach(el => {
+                el.style.background = '#1e293b';
+                el.style.color = '#e2e8f0';
+            });
+        }
+
+        function disableDarkMode() {
+            document.body.classList.remove('dark-mode');
+            location.reload();
+        }
+    </script>
+</body>
+</html>

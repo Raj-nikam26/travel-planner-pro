@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination Recommender - TravelPlan Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="../index.html" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        🌍 TravelPlan Pro
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="../index.html" class="text-gray-600 hover:text-gray-900 transition">Home</a>
+                    <a href="generator.html" class="text-gray-600 hover:text-gray-900 transition">Generator</a>
+                    <a href="recommender.html" class="text-gray-900 font-semibold border-b-2 border-blue-600 pb-1">Recommender</a>
+                    <a href="saved.html" class="text-gray-600 hover:text-gray-900 transition">My Trips</a>
+                    <a href="destinations.html" class="text-gray-600 hover:text-gray-900 transition">Destinations</a>
+                    
+                    <div class="flex items-center gap-4 border-l pl-8">
+                        <span id="auth-username" class="text-sm font-semibold text-gray-700"></span>
+                        <button onclick="logout()" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-2 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            🗺️ Destination Recommender
+        </h1>
+        <p class="text-center text-gray-600 mb-8">Tell us what you're looking for, and let AI find your perfect destination!</p>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Input Form -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">What Are You Looking For?</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🎯 Trip Type</label>
+                        <select id="tripType" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                            <option value="">Select trip type...</option>
+                            <option value="Beach">🏖️ Beach & Relaxation</option>
+                            <option value="Adventure">🏔️ Adventure & Hiking</option>
+                            <option value="Culture">🏛️ Culture & History</option>
+                            <option value="Food">🍜 Food & Cuisine</option>
+                            <option value="Nature">🌳 Nature & Wildlife</option>
+                            <option value="City">🏙️ City & Urban</option>
+                            <option value="Luxury">💎 Luxury & Relaxation</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">💰 Budget Range</label>
+                        <select id="budgetRange" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                            <option value="">Select budget...</option>
+                            <option value="Budget">💵 Budget ($0-1000)</option>
+                            <option value="Mid-range">💵💵 Mid-range ($1000-3000)</option>
+                            <option value="Luxury">💵💵💵 Luxury ($3000+)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🌡️ Season/Weather</label>
+                        <select id="season" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                            <option value="">Select season...</option>
+                            <option value="Hot">🔥 Hot & Sunny</option>
+                            <option value="Cool">❄️ Cool & Cold</option>
+                            <option value="Mild">🍂 Mild & Pleasant</option>
+                            <option value="Rainy">🌧️ Rainy Season</option>
+                            <option value="Any">🌍 Any Season</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🏙️ Crowd Preference</label>
+                        <select id="crowd" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                            <option value="">Select preference...</option>
+                            <option value="Crowded">😊 Crowded & Popular</option>
+                            <option value="Moderate">🤔 Moderate Crowds</option>
+                            <option value="Empty">🤐 Off the Beaten Path</option>
+                            <option value="Any">🌍 Any</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📝 Additional Preferences</label>
+                        <textarea id="preferences" placeholder="e.g., Vegetarian food, no visa required, family-friendly..." rows="3"
+                                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition"></textarea>
+                    </div>
+
+                    <button onclick="getRecommendations()" id="recommend-btn"
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300">
+                        ✨ Get Recommendations
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div>
+                <!-- Loading -->
+                <div id="loading" class="hidden bg-white rounded-xl shadow-xl p-12 text-center">
+                    <div class="flex space-x-2 mb-4 justify-center">
+                        <div class="w-4 h-4 bg-blue-600 rounded-full animate-bounce"></div>
+                        <div class="w-4 h-4 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-4 h-4 bg-amber-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                    <p class="text-xl text-gray-600 font-semibold">Finding perfect destinations...</p>
+                </div>
+
+                <!-- Recommendations -->
+                <div id="recommendations" class="hidden space-y-4"></div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="bg-white rounded-xl shadow-xl p-12 text-center">
+                    <div class="text-6xl mb-4">🌍</div>
+                    <p class="text-gray-600">Select your preferences and let AI recommend the best destinations for you!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            requireAuth();
+        });
+
+        const MODEL_NAME = "gemini-2.0-flash-exp";
+        const API_KEY = "AIzaSyDHjAULKuG1OLN8J5LNMkTgwQ5Fz_t8c3Y";
+
+        async function getRecommendations() {
+            const tripType = document.getElementById('tripType').value;
+            const budget = document.getElementById('budgetRange').value;
+            const season = document.getElementById('season').value;
+            const crowd = document.getElementById('crowd').value;
+            const preferences = document.getElementById('preferences').value;
+
+            if (!tripType || !budget || !season || !crowd) {
+                alert('❌ Please fill in all fields');
+                return;
+            }
+
+            document.getElementById('recommend-btn').disabled = true;
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('recommendations').classList.add('hidden');
+
+            const prompt = `Based on these preferences, recommend the TOP 3 BEST destinations:
+- Trip Type: ${tripType}
+- Budget: ${budget}
+- Season/Weather: ${season}
+- Crowd Preference: ${crowd}
+- Additional: ${preferences || 'None'}
+
+For EACH destination, provide:
+1. Destination Name
+2. Why it's perfect (2-3 sentences)
+3. Estimated Cost
+4. Best Time to Visit
+5. 3 Must-Do Activities
+
+Format as:
+🌟 Destination: [Name]
+📍 Why: [Reasons]
+💰 Cost: [Range]
+📅 Best Time: [Months]
+🎯 Activities:
+• Activity 1
+• Activity 2
+• Activity 3`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.candidates?.[0]?.content) {
+                    displayRecommendations(data.candidates[0].content.parts[0].text);
+                } else {
+                    alert('❌ Could not generate recommendations');
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            } finally {
+                document.getElementById('recommend-btn').disabled = false;
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        function displayRecommendations(text) {
+            const recommendationsDiv = document.getElementById('recommendations');
+            recommendationsDiv.innerHTML = '';
+
+            const destinations = text.split('🌟').slice(1);
+
+            destinations.forEach((dest, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-1';
+                card.style.animation = `fadeInUp 0.5s ease ${idx * 0.1}s`;
+                card.innerHTML = `
+                    <div class="flex items-start gap-3 mb-3">
+                        <span style="font-size: 32px;">${['🏖️', '🏔️', '🏛️'][idx]}</span>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">${dest.split('\n')[0]}</h3>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
+                        ${dest.replace(/\n/g, '<br>')}
+                    </div>
+                    <button onclick="goToGenerator('${dest.split('\n')[0].replace('Destination: ', '').trim().split(' ')[0]}')" 
+                            class="mt-4 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg hover:shadow-lg transition">
+                        Plan This Trip →
+                    </button>
+                `;
+                recommendationsDiv.appendChild(card);
+            });
+
+            document.getElementById('empty-state').classList.add('hidden');
+            recommendationsDiv.classList.remove('hidden');
+        }
+
+        function goToGenerator(destination) {
+            localStorage.setItem('selectedDestination', destination);
+            window.location.href = 'generator.html';
+        }
+    </script>
+    
+    <!-- Dark Mode Toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.createElement('button');
+            darkModeToggle.id = 'dark-mode-btn';
+            darkModeToggle.innerHTML = '🌙';
+            darkModeToggle.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                z-index: 999;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                transition: all 0.3s;
+            `;
+            
+            darkModeToggle.onmouseover = function() {
+                this.style.transform = 'scale(1.15)';
+            };
+            darkModeToggle.onmouseout = function() {
+                this.style.transform = 'scale(1)';
+            };
+            
+            if (localStorage.getItem('darkMode') === 'true') {
+                enableDarkMode();
+                darkModeToggle.innerHTML = '☀️';
+            }
+            
+            darkModeToggle.onclick = function() {
+                if (document.body.classList.contains('dark-mode')) {
+                    disableDarkMode();
+                    localStorage.setItem('darkMode', 'false');
+                    this.innerHTML = '🌙';
+                } else {
+                    enableDarkMode();
+                    localStorage.setItem('darkMode', 'true');
+                    this.innerHTML = '☀️';
+                }
+            };
+            
+            document.body.appendChild(darkModeToggle);
+        });
+
+        function enableDarkMode() {
+            document.body.classList.add('dark-mode');
+            document.body.style.background = '#0f172a';
+            document.querySelectorAll('.bg-white').forEach(el => {
+                el.style.background = '#1e293b';
+                el.style.color = '#e2e8f0';
+            });
+        }
+
+        function disableDarkMode() {
+            document.body.classList.remove('dark-mode');
+            location.reload();
+        }
+    </script>
+</body>
+</html>

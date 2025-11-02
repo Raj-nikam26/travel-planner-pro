@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Planner - TravelPlan Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#2563eb',
+                        'secondary': '#7c3aed',
+                        'accent': '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+    
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="../index.html" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        🌍 TravelPlan Pro
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="../index.html" class="text-gray-600 hover:text-gray-900 transition">Home</a>
+                    <a href="generator.html" class="text-gray-600 hover:text-gray-900 transition">Generator</a>
+                    <a href="saved.html" class="text-gray-600 hover:text-gray-900 transition">My Trips</a>
+                    <a href="destinations.html" class="text-gray-600 hover:text-gray-900 transition">Destinations</a>
+                    <a href="budget.html" class="text-gray-900 font-semibold border-b-2 border-blue-600 pb-1">Budget Planner</a>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <a href="../index.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">Home</a>
+            <a href="generator.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">Generator</a>
+            <a href="saved.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">My Trips</a>
+            <a href="destinations.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">Destinations</a>
+            <a href="budget.html" class="block px-4 py-2 text-gray-900 font-semibold bg-blue-50">Budget Planner</a>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-3">Travel Budget Calculator</h1>
+            <p class="text-lg text-gray-600">Plan your expenses and stay within budget</p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+            
+            <!-- Input Form -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-xl p-6 sticky top-20">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900">Add Expense</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                            <select id="expense-category" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                                <option value="🏨 Accommodation">🏨 Accommodation</option>
+                                <option value="✈️ Transportation">✈️ Transportation</option>
+                                <option value="🍽️ Food & Dining">🍽️ Food & Dining</option>
+                                <option value="🎭 Activities">🎭 Activities</option>
+                                <option value="🛍️ Shopping">🛍️ Shopping</option>
+                                <option value="💊 Health & Insurance">💊 Health & Insurance</option>
+                                <option value="📱 Communication">📱 Communication</option>
+                                <option value="💰 Miscellaneous">💰 Miscellaneous</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                            <input type="text" id="expense-description" placeholder="e.g., Hotel per night" 
+                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Amount (₹)</label>
+                            <input type="number" id="expense-amount" placeholder="0.00" step="0.01"
+                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                        </div>
+
+                        <button onclick="addExpense()" 
+                                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition">
+                            + Add Expense
+                        </button>
+
+                        <button onclick="clearBudget()" 
+                                class="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Overview & Expenses -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Summary Cards -->
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="text-sm text-gray-600 mb-1">Total Budget</div>
+                        <div id="total-budget" class="text-3xl font-bold text-blue-600">₹0.00</div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="text-sm text-gray-600 mb-1">Total Expenses</div>
+                        <div id="total-expenses" class="text-3xl font-bold text-purple-600">0</div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="text-sm text-gray-600 mb-1">Per Day</div>
+                        <div id="per-day" class="text-3xl font-bold text-amber-600">₹0.00</div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <!-- Chart -->
+<div class="bg-white rounded-xl shadow-xl p-6">
+    <h2 class="text-xl font-bold mb-4 text-gray-900">Budget Distribution</h2>
+    <div style="position: relative; height: 250px; max-width: 300px;">
+        <canvas id="budgetChart"></canvas>
+    </div>
+</div>
+
+
+                <!-- Category Breakdown -->
+                <div class="bg-white rounded-xl shadow-xl p-6">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900">Category Breakdown</h2>
+                    <div id="breakdown-container" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div class="text-center text-gray-500 py-8 col-span-full">No expenses added yet</div>
+                    </div>
+                </div>
+
+                <!-- Expenses List -->
+                <div class="bg-white rounded-xl shadow-xl p-6">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900">Expense Details</h2>
+                    <div id="expenses-list" class="space-y-2">
+                        <div class="text-center text-gray-500 py-8">Add your first expense to get started</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="bg-gray-900 text-white py-8 px-4 mt-12">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-gray-400">© 2025 TravelPlan Pro. Created by Raj Nikam.</p>
+        </div>
+    </footer>
+
+    <script src="../js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <script>
+        let expenses = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            requireAuth();
+            loadExpenses();
+        });
+
+        function addExpense() {
+            const category = document.getElementById('expense-category').value;
+            const description = document.getElementById('expense-description').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+
+            if (!category || !description || !amount || amount <= 0) {
+                alert('❌ Please fill in all fields correctly');
+                return;
+            }
+
+            expenses.push({
+                category,
+                description,
+                amount,
+                id: Date.now()
+            });
+
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+
+            document.getElementById('expense-description').value = '';
+            document.getElementById('expense-amount').value = '';
+
+            updateDisplay();
+            alert('✅ Expense added!');
+        }
+
+        function clearBudget() {
+            if (confirm('Are you sure you want to clear all expenses?')) {
+                expenses = [];
+                localStorage.removeItem('expenses');
+                updateDisplay();
+                alert('✅ All expenses cleared!');
+            }
+        }
+
+        function loadExpenses() {
+            const saved = localStorage.getItem('expenses');
+            if (saved) {
+                expenses = JSON.parse(saved);
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const categoryTotals = {};
+
+            expenses.forEach(exp => {
+                if (!categoryTotals[exp.category]) {
+                    categoryTotals[exp.category] = 0;
+                }
+                categoryTotals[exp.category] += exp.amount;
+            });
+
+            document.getElementById('total-budget').textContent = '₹' + total.toFixed(2);
+            document.getElementById('total-expenses').textContent = expenses.length;
+            document.getElementById('per-day').textContent = '₹' + (expenses.length > 0 ? (total / 30).toFixed(2) : '0.00');
+
+            // Update chart
+            const labels = Object.keys(categoryTotals);
+            const data = Object.values(categoryTotals);
+            updateChart(labels, data);
+
+            // Update breakdown
+            updateBreakdown(categoryTotals, total);
+
+            // Update expenses list
+            updateExpensesList();
+        }
+
+        function updateChart(labels, data) {
+    const ctx = document.getElementById('budgetChart').getContext('2d');
+
+    // Safely destroy the previous chart
+    if (window.budgetChart && typeof window.budgetChart.destroy === 'function') {
+        window.budgetChart.destroy();
+        window.budgetChart = null;
+    }
+
+    if (data.length === 0) {
+        return;
+    }
+
+    window.budgetChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: [
+                    '#3b82f6',
+                    '#10b981',
+                    '#8b5cf6',
+                    '#f59e0b',
+                    '#ec4899',
+                    '#6b7280',
+                    '#14b8a6',
+                    '#f97316'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+
+        function updateBreakdown(categoryTotals, total) {
+            if (total === 0) {
+                document.getElementById('breakdown-container').innerHTML = '<div class="text-center text-gray-500 py-8 col-span-full">No expenses added yet</div>';
+                return;
+            }
+
+            let html = '';
+            const colors = [
+                {bg: '#dbeafe', text: '#1e40af'},
+                {bg: '#dcfce7', text: '#166534'},
+                {bg: '#e9d5ff', text: '#581c87'},
+                {bg: '#fef3c7', text: '#92400e'},
+                {bg: '#fbcfe8', text: '#831843'},
+                {bg: '#f3f4f6', text: '#374151'},
+                {bg: '#ccfbf1', text: '#134e4a'},
+                {bg: '#fed7aa', text: '#9a3412'}
+            ];
+            let colorIndex = 0;
+
+            Object.entries(categoryTotals).forEach(([category, amount]) => {
+                const percentage = ((amount / total) * 100).toFixed(1);
+                const color = colors[colorIndex % colors.length];
+                html += `
+                    <div style="background: ${color.bg}; padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                        <p style="font-size: 0.875rem; color: #374151; margin: 0;">${category}</p>
+                        <p style="font-size: 1.25rem; font-weight: bold; color: ${color.text}; margin: 0.25rem 0;">₹${amount.toFixed(2)}</p>
+                        <p style="font-size: 0.75rem; color: #4b5563; margin: 0;">${percentage}%</p>
+                    </div>
+                `;
+                colorIndex++;
+            });
+
+            document.getElementById('breakdown-container').innerHTML = html;
+        }
+
+        function updateExpensesList() {
+            if (expenses.length === 0) {
+                document.getElementById('expenses-list').innerHTML = '<div class="text-center text-gray-500 py-8">Add your first expense to get started</div>';
+                return;
+            }
+
+            let html = '';
+            expenses.forEach(exp => {
+                html += `
+                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition">
+                        <div>
+                            <p class="font-semibold text-gray-900">${exp.category}</p>
+                            <p class="text-sm text-gray-600">${exp.description}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-blue-600">₹${exp.amount.toFixed(2)}</p>
+                            <button onclick="deleteExpense(${exp.id})" class="text-xs text-red-600 hover:text-red-800 mt-1">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('expenses-list').innerHTML = html;
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(exp => exp.id !== id);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            updateDisplay();
+        }
+
+        function exportBudget() {
+            const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const categoryTotals = {};
+
+            expenses.forEach(exp => {
+                if (!categoryTotals[exp.category]) {
+                    categoryTotals[exp.category] = 0;
+                }
+                categoryTotals[exp.category] += exp.amount;
+            });
+
+            let text = `TRIP BUDGET REPORT
+========================
+
+Date: ${new Date().toLocaleDateString()}
+
+BREAKDOWN:
+`;
+            
+            Object.entries(categoryTotals).forEach(([category, amount]) => {
+                text += `${category}: ₹${amount.toFixed(2)}\n`;
+            });
+
+            text += `\nTOTAL: ₹${total.toFixed(2)}
+
+Generated by TravelPlan Pro`;
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `budget_${Date.now()}.txt`;
+            a.click();
+            alert('✅ Budget exported!');
+        }
+    </script>
+
+    <!-- Dark Mode Toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.createElement('button');
+            darkModeToggle.id = 'dark-mode-btn';
+            darkModeToggle.innerHTML = '🌙';
+            darkModeToggle.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                z-index: 999;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                transition: all 0.3s;
+            `;
+            
+            darkModeToggle.onmouseover = function() {
+                this.style.transform = 'scale(1.15)';
+            };
+            darkModeToggle.onmouseout = function() {
+                this.style.transform = 'scale(1)';
+            };
+            
+            if (localStorage.getItem('darkMode') === 'true') {
+                enableDarkMode();
+                darkModeToggle.innerHTML = '☀️';
+            }
+            
+            darkModeToggle.onclick = function() {
+                if (document.body.classList.contains('dark-mode')) {
+                    disableDarkMode();
+                    localStorage.setItem('darkMode', 'false');
+                    this.innerHTML = '🌙';
+                } else {
+                    enableDarkMode();
+                    localStorage.setItem('darkMode', 'true');
+                    this.innerHTML = '☀️';
+                }
+            };
+            
+            document.body.appendChild(darkModeToggle);
+        });
+
+        function enableDarkMode() {
+            document.body.classList.add('dark-mode');
+            document.body.style.background = '#0f172a';
+            document.querySelectorAll('.bg-white').forEach(el => {
+                el.style.background = '#1e293b';
+                el.style.color = '#e2e8f0';
+            });
+        }
+
+        function disableDarkMode() {
+            document.body.classList.remove('dark-mode');
+            location.reload();
+        }
+    </script>
+
+</body>
+</html>
