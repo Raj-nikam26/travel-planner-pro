@@ -116,28 +116,17 @@ GEMINI_API_KEY=your_api_key_here
 - Safari (Latest)
 - Edge (Latest)
 
-## 🌐 Live Demo
-
-Visit: [**https://travelplan-pro.netlify.app**](https://travelplan-pro.netlify.app)
-
-## 📝 License
-
-This project is open source and available under the MIT License.
 
 ## 👨‍💻 Author
 
 **Raj Nikam** - Developer & Creator
 
-- GitHub: [@raj-nikam](https://github.com/YOUR-USERNAME)
-- Portfolio: [Your Portfolio]
+- GitHub: [@raj-nikam26](https://github.com/Raj-nikam26)
+
 
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to fork and submit pull requests.
-
-## 📧 Contact
-
-For questions or suggestions, feel free to reach out!
 
 ## 🎓 Learning Resources
 
